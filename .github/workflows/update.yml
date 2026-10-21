@@ -1,1 +1,33 @@
+name: Auto Update Clash Rules
 
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-rules:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: pip install pyyaml
+
+      - name: Download and Convert Rules
+        env:
+          SUB_URL: ${{ secrets.SUB_URL }}
+        run: python scripts/update_rules.py
+
+      - name: Commit and Push
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add acyun_rules.yaml
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Auto Update Rules" && git push)
