@@ -19,7 +19,13 @@ def main():
         if 'rules' not in config:
             sys.exit(1)
 
-        new_rules = config['rules']
+        new_rules = []
+        for rule in config['rules']:
+            rule_str = str(rule).strip()
+            if rule_str.startswith("GEOIP,") or rule_str.startswith("MATCH,"):
+                continue
+            new_rules.append(rule_str)
+
         new_data = {"payload": new_rules}
 
         file_path = "acyun_rules.yaml"
